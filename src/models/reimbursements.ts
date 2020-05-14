@@ -5,20 +5,20 @@ export class Reimbursements {
     submitted: Date;
     resolved: Date;
     description: string;
-    authorId: number;
-    resolvedId: number;
-    statusId: number;
-    typeId: number;
+    author: string;
+    resolver: number;
+    status: number;
+    type: number;
 
-    constructor(id: number, amount: number, sub: Date, res: Date, des: string, aId: number, resId: number, satId: number, typId: number) {
+    constructor(id: number, amount: number, sub: Date, res: Date, des: string, author: string, resovler: number, status: number, type: number) {
         this.reimbId = id;
         this.amount = amount;
         this.submitted = sub;
         this.resolved = res;
         this.description = des;
-        this.authorId = aId;
-        this.resolvedId = resId;
-        this.statusId = satId;
-        this.typeId = typId;
+        this.author = author;
+        this.resolver = resovler;
+        this.status = status;
+        this.type = type;
     }
 }
