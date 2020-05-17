@@ -98,17 +98,13 @@ export class ReimbursementRepository implements CrudRepository<Reimbursements> {
             let rs = await client.query(sql, [updatedReimbursement.amount, updatedReimbursement.description, updatedReimbursement.type]);
             return true;
         } catch (e) {
-            //Need to test line 92
             throw new InternalServerError();
         } finally {
             client && client.release();
         }
     }
 
-    /**
-     * 
-     * @param id The transaction id
-     */
+
     async deleteById(id: number): Promise<boolean> {
 
         let client: PoolClient;
