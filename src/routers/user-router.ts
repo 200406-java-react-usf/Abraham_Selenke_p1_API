@@ -24,8 +24,7 @@ UserRouter.get('', adminGuard, async (req, resp) => {
             let payload = await userService.getAllUsers();
             resp.status(200).json(payload)
         }
-    } catch (e) {
-
+    } catch (e) {        
         resp.status(e.statusCode).json(e)
     }
 });
