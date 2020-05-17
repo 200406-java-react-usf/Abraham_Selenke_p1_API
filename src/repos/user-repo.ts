@@ -33,7 +33,7 @@ export class UserRepository implements CrudRepository<User> {
             let sql = `${this.baseQuery}`;
             let rs = await client.query(sql);
             return rs.rows.map(mapUserResultSet);
-        } catch (e) {
+        } catch (e) {            
             throw new InternalServerError();
         } finally {
             client && client.release();
@@ -50,7 +50,9 @@ export class UserRepository implements CrudRepository<User> {
             let rs = await client.query(sql, [id]);
             return mapUserResultSet(rs.rows[0]);
         } catch (e) {
-               throw new InternalServerError();  
+            console.log(e);
+            
+            throw new InternalServerError();  
         } finally {
                client && client.release();
         } 
@@ -62,10 +64,10 @@ export class UserRepository implements CrudRepository<User> {
 
         try{
             client = await connectionPool.connect();
-            let sql = `${this.baseQuery} where au.${key} = $1`;
+            let sql = `${this.baseQuery} where u.${key} = $1`;
             let rs = await client.query(sql, [val]);
             return mapUserResultSet(rs.rows[0]);
-           } catch (e) {
+           } catch (e) {               
                throw new InternalServerError();  
            } finally {
                client && client.release();
@@ -79,7 +81,7 @@ export class UserRepository implements CrudRepository<User> {
         try {
             client = await connectionPool.connect();
             let sql = `${this.baseQuery} where u.username = $1 and u.password = $2`;
-            let rs = await client.query(sql, [un, pw]);
+            let rs = await client.query(sql, [un, pw]);            
             return mapUserResultSet(rs.rows[0]);
         } catch (e) {
             throw new InternalServerError();
