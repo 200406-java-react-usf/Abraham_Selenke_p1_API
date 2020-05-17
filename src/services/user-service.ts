@@ -75,8 +75,7 @@ export class UserService {
 
             let authUser: User;
             
-            authUser = await this.userRepo.getUserByCredentials(un, pw);
-           
+            authUser = await this.userRepo.getUserByCredentials(un, pw);          
 
             if (isEmptyObject(authUser)) {
                 throw new AuthenticationError('Bad credentials provided.');

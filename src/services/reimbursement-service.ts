@@ -9,9 +9,6 @@ export class ReimbursementService {
         this.reimbursementRepo = reimbursementRepo;
     }
 
-    /**
-     * Validates all accounts and removes time created
-     */
     async getAllReimbursements(): Promise<Reimbursements[]> {
 
         let reimbursements = await this.reimbursementRepo.getAll();
