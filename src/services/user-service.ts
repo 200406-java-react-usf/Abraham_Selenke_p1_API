@@ -107,7 +107,6 @@ export class UserService {
                 throw new  ResourcePersistenceError('The provided email is already taken.');
             }
 
-            newUser.role = 'user';
             const persistedUser = await this.userRepo.save(newUser);
 
             return this.removePassword(persistedUser);
