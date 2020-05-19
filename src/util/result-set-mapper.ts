@@ -14,7 +14,7 @@ export function mapUserResultSet(resultSet: UserSchema): User {
         resultSet.first_name,
         resultSet.last_name,
         resultSet.email,
-        resultSet.role_name
+        resultSet.roles
     );
 }
 

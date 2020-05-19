@@ -5,7 +5,7 @@ export interface UserSchema {
     first_name: string,
     last_name: string,
     email: string,
-    role_name: string
+    roles: string
 }
 
 export interface ReimbursementSchema {
