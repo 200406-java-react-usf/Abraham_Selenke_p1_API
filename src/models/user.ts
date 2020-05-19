@@ -6,7 +6,7 @@ export class User {
     firstName: string;
     lastName: string;
     email: string;
-    role: string;
+    roles: string;
 
     constructor(id: number, un: string, pw: string, fn: string, ln: string, email: string, role: string) {
         this.id = id;
@@ -15,6 +15,6 @@ export class User {
         this.firstName = fn;
         this.lastName = ln;
         this.email = email;
-        this.role = role;
+        this.roles = role;
     }
 }
