@@ -30,7 +30,7 @@ app.use(corsFilter);
 app.use('/', express.json());
 app.use('/users', UserRouter);
 app.use('/auth', AuthRouter);
-app.use('/account', ReimbursementRouter);
+app.use('/reimbursement', ReimbursementRouter);
 
 app.listen(8080, () => {
     console.log('Application running and listening at: http://localhost:8080');
