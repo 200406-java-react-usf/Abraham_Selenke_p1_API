@@ -18,7 +18,7 @@ export class UserRepository implements CrudRepository<User> {
         u.first_name,
         u.last_name,
         u.email,
-        ur.role_name
+        ur.roles
     from users u
     join user_roles ur
     on u.user_role_id = ur.role_id
@@ -49,9 +49,7 @@ export class UserRepository implements CrudRepository<User> {
             let sql = `${this.baseQuery} where u.user_id = $1`;
             let rs = await client.query(sql, [id]);
             return mapUserResultSet(rs.rows[0]);
-        } catch (e) {
-            console.log(e);
-            
+        } catch (e) {            
             throw new InternalServerError();  
         } finally {
                client && client.release();
@@ -103,14 +101,11 @@ export class UserRepository implements CrudRepository<User> {
             values ($1, $2, $3, $4, $5) 
             returning user_id
             `;
-            let rs = await client.query(sql, [newUser.username, newUser.password, newUser.firstName, newUser.lastName, newUser.email]);
-            console.log(rs.rows[0]);
-            
+            let rs = await client.query(sql, [newUser.username, newUser.password, newUser.firstName, newUser.lastName, newUser.email]);            
             newUser.id = rs.rows[0].id;
             return newUser;
 
         } catch (e) {
-            console.log(e);
             throw new InternalServerError();
         } finally {
             client && client.release();
@@ -128,7 +123,7 @@ export class UserRepository implements CrudRepository<User> {
             let sql = `
             update users
             set username = $2, password = $3, first_name = $4, last_name = $5, email = $6
-            where id = $1`;
+            where user_id = $1`;
             let rs = await client.query(sql, [updatedUser.id, updatedUser.username, updatedUser.password, updatedUser.firstName, updatedUser.lastName, updatedUser.email]);
             return true;
         } catch (e) {
@@ -145,8 +140,8 @@ export class UserRepository implements CrudRepository<User> {
         try {
             client = await connectionPool.connect();
             let sql = `
-            delete from user
-            where id = $1`;
+            delete from users
+            where user_id = $1`;
             let rs = await client.query(sql, [id]);
             return true;
         } catch (e) {
