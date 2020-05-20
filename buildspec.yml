@@ -1,15 +1,22 @@
 version: 0.2
+
 phases:
-  install: 
+  install:
     runtime-versions:
       nodejs: 12
   pre_build:
     commands:
       - npm install
-      #- echo "We would use 'npm test' here to run our tests (if we had any)"
-  build: 
+      # - npm run test
+  build:
     commands:
       - npm run build
   post_build:
     commands:
-      - aws s3 sync . s3://aselenke-project1-ui
+      - echo Build completed on `date`
+
+artifacts:
+  files:
+    - node_modules/**/*
+    - ./build/**/*
+    - package.json
