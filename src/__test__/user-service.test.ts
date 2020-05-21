@@ -102,7 +102,7 @@ describe('userService', () => {
 		let result = await sut.getUserById(1);
 
 		expect(result).toBeTruthy();
-		expect(result.id).toBe(1);
+		expect(result.user_id).toBe(1);
 		expect(result.password).toBeUndefined();
 	});
 

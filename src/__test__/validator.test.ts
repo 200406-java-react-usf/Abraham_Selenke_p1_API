@@ -92,7 +92,7 @@ describe('validator', () => {
 
         expect.assertions(2);
 
-        let result1 = isValidObject(new Reimbursements(1, 250.00, new Date(), new Date(), 'Travel to training', 'turmboi', 1, 2, 2));
+        let result1 = isValidObject(new Reimbursements(1, 250.00, new Date(), new Date(), 'Travel to training', 1, 1, 'Pending', 'Food'));
         let result2 = isValidObject(new User(1, 'turmboi', 'numberone', 'boi', 'JJ', 'jj@test.com', 'Admin'));
 
         expect(result1).toBe(true);
@@ -104,7 +104,7 @@ describe('validator', () => {
 
         expect.assertions(2);
 
-        let result1 = isValidObject(new Reimbursements(1, 250.00, new Date(), new Date(), 'Travel to training', 'turmboi', 1, 2, 2), 'id');
+        let result1 = isValidObject(new Reimbursements(1, 250.00, new Date(), new Date(), 'Travel to training', 1, 1, 'Pending', 'Food'), 'id');
         let result2 = isValidObject(new User(3, 'turmboi', 'numberone', 'boi', 'JJ', 'jj@test.com', 'Admin'), 'id');
 
         expect(result1).toBe(true);

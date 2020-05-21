@@ -31,7 +31,7 @@ describe('userRepo Testing', () => {
                     return {
                         rows: [
                             {
-                                id: 1,
+                                user_id: 1,
                                 username: 'testUser',
                                 password: 'password',
                                 firstName: 'Test',
@@ -124,7 +124,7 @@ describe('userRepo Testing', () => {
 		});
 
 		try {
-			await sut.getById(mockUser.id);
+			await sut.getById(mockUser.user_id);
 		} catch (e) {
 			expect(e instanceof InternalServerError).toBe(true);
 		}
