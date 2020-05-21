@@ -52,7 +52,7 @@ UserRouter.post('', async (req, resp) => {
 });
 
 UserRouter.put('', async (req, resp) => {
-
+        
     try {
         let updateUser = await userService.updateUser(req.body);
         return resp.status(201).json(updateUser);
