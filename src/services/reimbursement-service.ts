@@ -38,8 +38,8 @@ export class ReimbursementService {
     async addNewReimbursement(newReimbursement: Reimbursements): Promise<Reimbursements> {
         try{
             
-            if(!isValidId(newReimbursement.type)) {
-                throw new BadRequestError('Invalid property value in account type.')
+            if(!isValidString(newReimbursement.type)) {
+                throw new BadRequestError('Invalid property value in reimbursement type.')
             }
 
             const reimbursementCreated = await this.reimbursementRepo.save(newReimbursement);
@@ -53,7 +53,7 @@ export class ReimbursementService {
     async updateReimbursement(updateReimbursement: Reimbursements): Promise<boolean> {
 
         try {
-            if(!isValidId(updateReimbursement.type)) {
+            if(!isValidString(updateReimbursement.type)) {
                 throw new BadRequestError()
             }
 
