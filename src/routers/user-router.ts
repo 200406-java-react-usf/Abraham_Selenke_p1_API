@@ -41,7 +41,7 @@ UserRouter.get('/:id', async (req, resp) => {
     }
 });
 
-UserRouter.post('', async (req, resp) => {
+UserRouter.post('', adminGuard, async (req, resp) => {
 
     try {
         let newUser = await userService.addNewUser(req.body);
@@ -51,7 +51,7 @@ UserRouter.post('', async (req, resp) => {
     }
 });
 
-UserRouter.put('', async (req, resp) => {
+UserRouter.put('', adminGuard, async (req, resp) => {
         
     try {
         let updateUser = await userService.updateUser(req.body);
@@ -61,7 +61,7 @@ UserRouter.put('', async (req, resp) => {
     }
 });
 
-UserRouter.delete('', async (req, resp) => {
+UserRouter.delete('', adminGuard, async (req, resp) => {
 
     try {
         let deleteUser = await userService.deleteById(req.body);
