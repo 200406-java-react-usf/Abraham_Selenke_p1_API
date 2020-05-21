@@ -20,13 +20,13 @@ export class UserService {
             return users.map(this.removePassword);
     }
 
-    async getUserById(id: number): Promise<User> {
+    async getUserById(user_id: number): Promise<User> {
         
-        if (!isValidId(id)) {
+        if (!isValidId(user_id)) {
             throw new BadRequestError();
         }
 
-        let user = await this.userRepo.getById(id);
+        let user = await this.userRepo.getById(user_id);
 
         if(isEmptyObject(user)) {
             throw new ResourceNotFoundError();
@@ -119,21 +119,38 @@ export class UserService {
 
     async updateUser(updatedUser: User): Promise<boolean> {
         
-        try {
-            if (!isValidObject(updatedUser)) {
-                throw new BadRequestError('Invalid user provided (invalid values found).');
+        try{
+
+            if(!isValidObject(updatedUser, 'id') || !isValidId(updatedUser.user_id)){
+                throw new BadRequestError('Invalid User was input');
             }
 
-            let usernameAvailable = await this.isUsernameAvailable(updatedUser.username);
-            if (!usernameAvailable) {
-                throw new ResourcePersistenceError('The provided username is already taken.');
+            let userToUpdate = await this.getUserById(updatedUser.user_id);
+
+            if(!userToUpdate){
+                throw new ResourceNotFoundError('No user found to update');
             }
-        
-            let emailAvailable = await this.isEmailAvailable(updatedUser.email);
-            if (!emailAvailable) {
-                throw new  ResourcePersistenceError('The provided email is already taken.');
+
+            let emailConflict = await this.isEmailAvailable(updatedUser.email);
+
+            if(userToUpdate.email === updatedUser.email){
+                emailConflict = true;
             }
-            
+
+            if(!emailConflict){
+                throw new ResourcePersistenceError('Email is already taken');
+            }
+
+            let usernameConflict = await this.isUsernameAvailable(updatedUser.username);
+
+            if(userToUpdate.username === updatedUser.username){
+                usernameConflict = true;
+            }
+
+            if(!usernameConflict){
+                throw new ResourcePersistenceError('Username is already taken');
+            }
+
             return await this.userRepo.update(updatedUser);
 
         } catch (e) {
