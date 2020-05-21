@@ -16,7 +16,7 @@ export class ReimbursementRepository implements CrudRepository<Reimbursements> {
         r.submitted,
         r.resolved, 
         r.description,
-        u.first_name,
+        r.author_id,
         r.resolver_id,
         rs.reimb_status, 
         rt.reimb_type
@@ -25,10 +25,6 @@ export class ReimbursementRepository implements CrudRepository<Reimbursements> {
     on rt.reimb_type_id = r.reimb_type_id
     left join reimbursement_statuses rs
     on rs.reimb_status_id = r.reimb_status_id
-    left join users u
-    on u.user_role_id = r.author_id
-    left join users 
-    on u.user_role_id = r.resolver_id
     `;
 
     async getAll(): Promise<Reimbursements[]> {
@@ -37,8 +33,9 @@ export class ReimbursementRepository implements CrudRepository<Reimbursements> {
         try {
             client = await connectionPool.connect();
             let sql = `${this.baseQuery}`;
-            let rs = await client.query(sql);
+            let rs = await client.query(sql);            
             return rs.rows.map(mapReimbursementResultSet);
+            
         } catch (e) {
             throw new InternalServerError();
         } finally {
@@ -69,11 +66,13 @@ export class ReimbursementRepository implements CrudRepository<Reimbursements> {
         try {
 
             client = await connectionPool.connect();
+            let reimbStatus = (await client.query(`select rs.reimb_status_id from reimbursement_statuses rs where rs.reimb_status = $1`, [newReimbursement.status])).rows[0].reimb_status_id;
+            let reimbType = (await client.query(`select rt.reimb_type_id from reimbursement_types rt where rt.reimb_type = $1`, [newReimbursement.type])).rows[0].reimb_type_id;
             let sql = `
-            insert into reimbursements (amount, submitted, description, first_name, reimb_type)
+            insert into reimbursements (amount, description, author_id, reimb_status_id, reimb_type_id)
             values ($1, $2, $3, $4, $5) 
-            returning id`;
-            let rs = await client.query(sql, [newReimbursement.amount, newReimbursement.submitted, newReimbursement.description, newReimbursement.type]);
+            returning reimb_id`;
+            let rs = await client.query(sql, [newReimbursement.amount, newReimbursement.description, newReimbursement.authorId, reimbStatus, reimbType]);
             newReimbursement.reimbId = rs.rows[0].id;
             return newReimbursement;
 
@@ -90,12 +89,12 @@ export class ReimbursementRepository implements CrudRepository<Reimbursements> {
         let client: PoolClient;
         try {
             client = await connectionPool.connect();
-
+            let reimbType = (await client.query(`select rt.reimb_type_id from reimbursement_types rt where rt.reimb_type = $1`, [updatedReimbursement.type])).rows[0].reimb_type_id;
             let sql = `
             update reimbursements
-            set amount = $2, description = $3, reimb_type = $4
-            where id = $1`;
-            let rs = await client.query(sql, [updatedReimbursement.amount, updatedReimbursement.description, updatedReimbursement.type]);
+            set amount = $2, description = $3, reimb_type_id = $4
+            where reimb_id = $1`;
+            let rs = await client.query(sql, [updatedReimbursement.reimbId, updatedReimbursement.amount, updatedReimbursement.description, reimbType]);
             return true;
         } catch (e) {
             throw new InternalServerError();
@@ -113,7 +112,7 @@ export class ReimbursementRepository implements CrudRepository<Reimbursements> {
             client = await connectionPool.connect();
             let sql = `
             delete from reimbursements
-            where id = $1`;
+            where reimb_id = $1`;
             let rs = await client.query(sql, [id]);
             return true;
         } catch (e) {
