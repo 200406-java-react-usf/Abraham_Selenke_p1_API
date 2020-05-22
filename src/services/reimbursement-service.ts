@@ -37,13 +37,12 @@ export class ReimbursementService {
 
     async addNewReimbursement(newReimbursement: Reimbursements): Promise<Reimbursements> {
         try{
-            
-            if(!isValidId(newReimbursement.type)) {
-                throw new BadRequestError('Invalid property value in account type.')
+            if(!isValidString(newReimbursement.reimb_type)) {
+                throw new BadRequestError('Invalid property value in reimbursement type.')
             }
-
+            
             const reimbursementCreated = await this.reimbursementRepo.save(newReimbursement);
-
+            
             return reimbursementCreated;
         } catch (e) {
             throw e
@@ -53,7 +52,7 @@ export class ReimbursementService {
     async updateReimbursement(updateReimbursement: Reimbursements): Promise<boolean> {
 
         try {
-            if(!isValidId(updateReimbursement.type)) {
+            if(!isValidString(updateReimbursement.reimb_type)) {
                 throw new BadRequestError()
             }
 
@@ -85,5 +84,20 @@ export class ReimbursementService {
             throw e;
         }
 
+    }
+
+    async getByAuthor(id: number): Promise<Reimbursements[]> {
+
+        if(!isValidId(id)){
+            throw new BadRequestError();
+        }
+
+        let authorReimbursements = await this.reimbursementRepo.getByAuthor(id);
+
+        if(authorReimbursements.length === 0){
+            throw new ResourceNotFoundError();
+        }
+
+        return authorReimbursements;
     }
 }

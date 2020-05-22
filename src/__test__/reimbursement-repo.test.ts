@@ -1,5 +1,5 @@
-import { UserRepository } from '../repos/user-repo';
-import { User } from '../models/user';
+import { ReimbursementRepository } from '../repos/reimbursement-repo';
+import { Reimbursements } from '../models/reimbursements';
 import * as mockIndex from '..';
 import * as mockMapper from '../util/result-set-mapper';
 import { InternalServerError } from '../errors/errors';
@@ -16,12 +16,12 @@ jest.mock('..', () => {
 //Mocking result set mapper
 jest.mock('../util/result-set-mapper', () => {
     return {
-        mapUserResultSet: jest.fn()
+        mapReimbursementResultSet: jest.fn()
     }
 });
 
-describe('userRepo Testing', () => {
-    let sut = new UserRepository();
+describe('reimbRepo Testing', () => {
+    let sut = new ReimbursementRepository();
     let mockConnect = mockIndex.connectionPool.connect;
 
     beforeEach(() => {
@@ -31,13 +31,15 @@ describe('userRepo Testing', () => {
                     return {
                         rows: [
                             {
-                                user_id: 1,
-                                username: 'testUser',
-                                password: 'password',
-                                firstName: 'Test',
-                                lastName: 'Tester',
-                                email: 'test8@email.com',  
-                                roles: 'Admin'
+                                reimb_id: 1,
+                                amount: 250.00,
+                                submitted: new Date(),
+                                resolved: new Date(),
+                                description: 'Heading to USF',
+                                author_id: 1,
+                                resolver: 2,
+                                reimb_status: 'Approved',
+                                reimb_type: 'Travel'
                             }
                         ]
                     }
@@ -45,14 +47,14 @@ describe('userRepo Testing', () => {
                 release: jest.fn()
             }
         });
-        (mockMapper.mapUserResultSet as jest.Mock).mockClear(); 
+        (mockMapper.mapReimbursementResultSet as jest.Mock).mockClear(); 
     });
 
-    test('Return the array of Users when getAll is called', async () => {
+    test('Return the array of Reimbursements when getAll is called', async () => {
         expect.hasAssertions();
 
-        let mockUser = new User(1, 'un', 'pw', 'fn', 'ln', 'email', 'role');
-        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
+        let mockReimbursements = new Reimbursements(1, 250.00, new Date(), new Date(), "Traveling to Florida", 2, 3, 'Approved', 'Travel');
+        (mockMapper.mapReimbursementResultSet as jest.Mock).mockReturnValue(mockReimbursements);
 
         let result = await sut.getAll();
 
@@ -81,17 +83,17 @@ describe('userRepo Testing', () => {
 
     });
 
-    test('should resolve to a User object when getById retrieves a record from data source', async () => {
+    test('should resolve to a Reimbursements object when getById retrieves a record from data source', async () => {
 
         expect.hasAssertions();
 
-        let mockUser = new User(1, 'un', 'pw', 'fn', 'ln', 'email', 'Admin');
-        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
+        let mockReimbursements = new Reimbursements(1, 250.00, new Date(), new Date(), "Traveling to Florida", 2, 3, 'Approved', 'Travel');
+        (mockMapper.mapReimbursementResultSet as jest.Mock).mockReturnValue(mockReimbursements);
 
         let result = await sut.getById(1);
 
         expect(result).toBeTruthy();
-        expect(result instanceof User).toBe(true);
+        expect(result instanceof Reimbursements).toBe(true);
 
     });
 
@@ -115,7 +117,7 @@ describe('userRepo Testing', () => {
     test('should throw InternalServerError when getById is envoked but query is unsuccesful', async () => {
 
 		expect.hasAssertions();
-		let mockUser = new User(1, 'test', 'password', 'Test', 'TestLast', 'email', 'Admin');
+		let mockReimbursements = new Reimbursements(1, 250.00, new Date(), new Date(), "Traveling to Florida", 2, 3, 'Approved', 'Travel');
 		(mockConnect as jest.Mock).mockImplementation( () => {
 			return {
 				query: jest.fn().mockImplementation( () => { return false; }),
@@ -124,18 +126,18 @@ describe('userRepo Testing', () => {
 		});
 
 		try {
-			await sut.getById(mockUser.user_id);
+			await sut.getById(mockReimbursements.reimb_id);
 		} catch (e) {
 			expect(e instanceof InternalServerError).toBe(true);
 		}
     });    
 
-    test('should return a newUser when save works', async () => {
+    test('should return a newReimbursement when save works', async () => {
 
 		expect.hasAssertions();
-        let mockUser = new User(1, 'test', 'password', 'Test', 'TestLast', 'email', 'Admin');
+        let mockReimbursements = new Reimbursements(2, 250.00, new Date(), new Date(), "Traveling to Florida", 2, 3, 'Approved', 'Travel');
         
-		let result = await sut.save(mockUser);
+		let result = await sut.save(mockReimbursements);
 
 		expect(result).toBeTruthy();
     });
@@ -143,7 +145,7 @@ describe('userRepo Testing', () => {
     test('should throw InternalServerError when save is envoked but query is unsuccesful', async () => {
 
 		expect.hasAssertions();
-		let mockUser = new User(1, 'test', 'password', 'Test', 'TestLast', 'email', 'admin');
+		let mockReimbursements = new Reimbursements(1, 250.00, new Date(), new Date(), "Traveling to Florida", 2, 3, 'Approved', 'Travel');
 		(mockConnect as jest.Mock).mockImplementation( () => {
 			return {
 				query: jest.fn().mockImplementation( () => { return false; }),
@@ -152,7 +154,7 @@ describe('userRepo Testing', () => {
 		});
 
 		try {
-			await sut.save(mockUser);
+			await sut.save(mockReimbursements);
 		} catch (e) {
 			expect(e instanceof InternalServerError).toBe(true);
 		}
@@ -161,7 +163,7 @@ describe('userRepo Testing', () => {
     test('should return void when deleteById works', async () => {
 
 		expect.hasAssertions();
-		let mockUser = new User(1, 'test', 'password', 'Test', 'TestLast', 'email', 'Admin');
+		let mockReimbursements = new Reimbursements(1, 250.00, new Date(), new Date(), "Traveling to Florida", 2, 3, 'Approved', 'Travel');
 		(mockConnect as jest.Mock).mockImplementation( () => {
 			return {
 				query: jest.fn().mockImplementation( () => { return; }),
@@ -195,7 +197,7 @@ describe('userRepo Testing', () => {
     test('should throw InternalServerError when update is envoked but query is unsuccesful', async () => {
 
 		expect.hasAssertions();
-		let mockUser = new User(1, 'test', 'password', 'Test', 'TestLast', 'email', 'Admin');
+		let mockReimbursements = new Reimbursements(1, 250.00, new Date(), new Date(), "Traveling to Florida", 2, 3, 'Approved', 'Travel');
 		(mockConnect as jest.Mock).mockImplementation( () => {
 			return {
 				query: jest.fn().mockImplementation( () => { return false; }),
@@ -204,87 +206,74 @@ describe('userRepo Testing', () => {
 		});
 
 		try {
-			await sut.update(mockUser);
+			await sut.update(mockReimbursements);
 		} catch (e) {
 			expect(e instanceof InternalServerError).toBe(true);
 		}
     });
     
-    test('should return user when update works', async () => {
+    test('should return Reimbursements when update works', async () => {
 
 		expect.hasAssertions();
 
-        let mockUser = new User(1, 'un', 'pw', 'fn', 'ln', 'email', 'Admin');
-        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
+        let mockReimbursements = new Reimbursements(1, 250.00, new Date(), new Date(), "Traveling to Florida", 2, 3, 'Approved', 'Travel');
+        (mockMapper.mapReimbursementResultSet as jest.Mock).mockReturnValue(mockReimbursements);
 
-        let result = await sut.update(mockUser);
+        let result = await sut.update(mockReimbursements);
 
         expect(result).toBeTruthy();
         expect(result).toBe(true);
 
     });
 
-	test('should return a user when getUserByCredentials is given a valid email', async() => {
+    test('should resolve to a Reimbursements object when getByAuthor retrieves a record from data source', async () => {
 
         expect.hasAssertions();
 
-        let mockUser = new User(3, 'un', 'pw', 'fn', 'ln', 'email', 'Admin');
-        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
+        let mockReimbursements = new Reimbursements(1, 250.00, new Date(), new Date(), "Traveling to Florida", 2, 3, 'Approved', 'Travel');
+        (mockMapper.mapReimbursementResultSet as jest.Mock).mockReturnValue(mockReimbursements);
 
-        let result = await sut.getUserByCredentials(mockUser.username, mockUser.password);
+        let result = await sut.getByAuthor(mockReimbursements.author_id);
 
         expect(result).toBeTruthy();
-        expect(result instanceof User).toBe(true);
+        expect(result instanceof Reimbursements).toBe(false);
+		
     });
+
+    test('should throw InternalServerError when getByAuthor is envoked but query is unsuccesful', async () => {
+
+		//expect.hasAssertions();
+		let mockReimbursements = new Reimbursements(1, 250.00, new Date(), new Date(), "Traveling to Florida", 2, 3, 'Approved', 'Travel');
+		(mockConnect as jest.Mock).mockImplementation( () => {
+			return {
+				query: jest.fn().mockImplementation( () => { return false; }),
+				release: jest.fn()
+			};
+		});
+
+		try {
+			await sut.getByAuthor(mockReimbursements.author_id);
+		} catch (e) {
+			expect(e instanceof InternalServerError).toBe(true);
+		}
+    });  
     
-    test('should throw InternalServerError when getUserByCredentials is envoked but query is unsuccesful', async () => {
+    test('should throw InternalServerError when getByAuthor is envoked but query is unsuccesful', async () => {
 
-		expect.hasAssertions();
-		let mockUser = new User(1, ' ', 'password', 'Test', 'TestLast', 'email', 'Admin');
+		//expect.hasAssertions();
+		let mockReimbursements = new Reimbursements(1, 250.00, new Date(), new Date(), "Traveling to Florida", 0, 3, 'Approved', 'Travel');
 		(mockConnect as jest.Mock).mockImplementation( () => {
 			return {
-				query: jest.fn().mockImplementation( () => { return false; }),
+				query: jest.fn().mockImplementation(() => {mockReimbursements}),
 				release: jest.fn()
 			};
 		});
 
 		try {
-			await sut.getUserByCredentials(mockUser.username, mockUser.password);
+			await sut.getByAuthor(1);
 		} catch (e) {
 			expect(e instanceof InternalServerError).toBe(true);
 		}
-    });
-	
-	test('should return a user when getByUniqueKey is given valid key and value', async() => {
-
-        expect.hasAssertions();
-
-        let mockUser = new User(3, 'un', 'pw', 'fn', 'ln', 'email', 'Admin');
-        (mockMapper.mapUserResultSet as jest.Mock).mockReturnValue(mockUser);
-
-        let result = await sut.getUserByUniqueKey('username', mockUser.username);
-
-        expect(result).toBeTruthy();
-        expect(result instanceof User).toBe(true);
-
-    });
-
-    test('should throw InternalServerError when getByUniqueKey is envoked but query is unsuccesful', async () => {
-
-		expect.hasAssertions();
-		let mockUser = new User(1, ' ', 'password', 'Test', 'TestLast', 'email', 'Admin');
-		(mockConnect as jest.Mock).mockImplementation( () => {
-			return {
-				query: jest.fn().mockImplementation( () => { return false; }),
-				release: jest.fn()
-			};
-		});
-
-		try {
-			await sut.getUserByUniqueKey('username', mockUser.username);
-		} catch (e) {
-			expect(e instanceof InternalServerError).toBe(true);
-		}
-    });
+    });   
 
 });

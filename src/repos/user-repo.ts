@@ -6,7 +6,6 @@ import { InternalServerError } from '../errors/errors';
 import { PoolClient } from 'pg';
 import { connectionPool } from '..';
 import { mapUserResultSet } from '../util/result-set-mapper';
-import { cursorTo } from 'readline';
 
 export class UserRepository implements CrudRepository<User> {
 
@@ -102,7 +101,7 @@ export class UserRepository implements CrudRepository<User> {
             returning user_id
             `;
             let rs = await client.query(sql, [newUser.username, newUser.password, newUser.firstName, newUser.lastName, newUser.email]);            
-            newUser.id = rs.rows[0].id;
+            newUser.user_id = rs.rows[0].id;
             return newUser;
 
         } catch (e) {
@@ -118,15 +117,15 @@ export class UserRepository implements CrudRepository<User> {
         let client: PoolClient;
         try {
             client = await connectionPool.connect();
-            //Need to test lines 125 to 131
-            let userId = (await client.query('select id from users where id = $1', [updatedUser.id])).rows[0].id;
+            let roleId = (await client.query('select role_id from user_roles where roles = $1;', [updatedUser.roles])).rows[0].role_id;
+            
             let sql = `
             update users
-            set username = $2, password = $3, first_name = $4, last_name = $5, email = $6
+            set username = $2, password = $3, first_name = $4, last_name = $5, email = $6, user_role_id = $7
             where user_id = $1`;
-            let rs = await client.query(sql, [updatedUser.id, updatedUser.username, updatedUser.password, updatedUser.firstName, updatedUser.lastName, updatedUser.email]);
+            let rs = await client.query(sql, [updatedUser.user_id, updatedUser.username, updatedUser.password, updatedUser.firstName, updatedUser.lastName, updatedUser.email, roleId]);
             return true;
-        } catch (e) {
+        } catch (e) {            
             throw new InternalServerError();
         } finally {
             client && client.release();
