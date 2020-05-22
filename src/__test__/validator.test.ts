@@ -116,7 +116,7 @@ describe('validator', () => {
 
         expect.assertions(3);
 
-        let result1 = isPropertyOf('id', User);
+        let result1 = isPropertyOf('user_id', User);
         let result2 = isPropertyOf('username', User);
         let result3 = isPropertyOf('amount', Reimbursements);
 
@@ -125,6 +125,18 @@ describe('validator', () => {
         expect(result3).toBe(true);
 
     });
+
+    test('should return false when isValidObject is provided invalid object with no nullable prop(s)', () => {
+        
+        expect.assertions(2);
+        let result1 = isValidObject(new User(1, 'username', 'password', '', 'last', 'email', 'Admin'), 'user_id');
+        let result2 = isValidObject(new User(1, 'username', 'password', '', 'last', 'email', 'Admin'));
+
+        expect(result1).toBe(false);
+        expect(result2).toBe(false);
+
+    });
+
 
     test('should return false when isPropertyOf is provided a unknown property of a given constructable type', () => {
 

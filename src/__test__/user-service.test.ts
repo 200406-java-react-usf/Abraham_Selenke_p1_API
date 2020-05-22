@@ -1,7 +1,6 @@
 import { UserService } from '../services/user-service';
 import { User } from '../models/user';
-
-import { ResourceNotFoundError, BadRequestError, ResourcePersistenceError, AuthenticationError } from '../errors/errors';
+import { ResourceNotFoundError, BadRequestError, AuthenticationError } from '../errors/errors';
 import validator from '../util/validator';
 
 jest.mock('../repos/user-repo', () => {
@@ -18,6 +17,7 @@ jest.mock('../repos/user-repo', () => {
         isEmailAvailable = jest.fn();
 	};
 });
+
 
 describe('userService', () => {
 
@@ -230,19 +230,6 @@ describe('userService', () => {
 		}
 	});
 
-	test('should return true when updateUser is envoked and given a valid user object', async () => {
-
-		expect.hasAssertions();
-		sut.isUsernameAvailable = jest.fn().mockReturnValue(true);
-        sut.isEmailAvailable = jest.fn().mockReturnValue(true);
-		mockRepo.update = jest.fn().mockReturnValue(true);
-
-		let result = await sut.updateUser(new User(4, 'Test', 'password', 'TestFirst', 'TestLast', 'test@user.com', 'Admin'));
-
-		expect(result).toBe(true);
-
-	});
-
     //Need to look into
 	test('should throw BadRequestError when updateUser is envoked and given an invalid user object', async () => {
 
@@ -388,4 +375,6 @@ describe('userService', () => {
             }
 
 	});
+
+	
 });

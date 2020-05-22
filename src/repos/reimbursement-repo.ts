@@ -89,13 +89,15 @@ export class ReimbursementRepository implements CrudRepository<Reimbursements> {
         
         let client: PoolClient;
         try {
+            
             client = await connectionPool.connect();
+            let reimbStatus = (await client.query(`select rs.reimb_status_id from reimbursement_statuses rs where rs.reimb_status = $1`, [updatedReimbursement.reimb_status])).rows[0].reimb_status_id;
             let reimbType = (await client.query(`select rt.reimb_type_id from reimbursement_types rt where rt.reimb_type = $1`, [updatedReimbursement.reimb_type])).rows[0].reimb_type_id;
             let sql = `
             update reimbursements
-            set amount = $2, description = $3, reimb_type_id = $4
+            set amount = $2, description = $3, resolver_id = $4, reimb_status_id = $5, reimb_type_id = $6
             where reimb_id = $1`;
-            let rs = await client.query(sql, [updatedReimbursement.reimb_id, updatedReimbursement.amount, updatedReimbursement.description, reimbType]);
+            let rs = await client.query(sql, [updatedReimbursement.reimb_id, updatedReimbursement.amount, updatedReimbursement.description, updatedReimbursement.resolver, reimbStatus, reimbType]);
             return true;
         } catch (e) {
             throw new InternalServerError();

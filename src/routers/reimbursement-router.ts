@@ -40,7 +40,8 @@ ReimbursementRouter.post('', empGuard, async (req, resp) => {
 });
 
 ReimbursementRouter.put('', async (req, resp) => {
-
+    console.log(req.body);
+    
     try {
         let updatedReimbursement = await reimbursementService.updateReimbursement(req.body);
         return resp.status(201).json(updatedReimbursement);
